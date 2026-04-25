@@ -5,8 +5,6 @@ export default function App() {
   const [sopInput, setSopInput] = useState('')
   const [sopOutput, setSopOutput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [audioFile, setAudioFile] = useState(null)
-  const [transcription, setTranscription] = useState('')
 
   const generateSOP = async () => {
     if (!sopInput.trim()) {
@@ -15,40 +13,38 @@ export default function App() {
     }
 
     setLoading(true)
-    try {
-      const response = await fetch('/api/generate-sop', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input: sopInput })
-      })
-      const data = await response.json()
-      setSopOutput(data.sop || 'Error generating SOP')
-    } catch (error) {
-      setSopOutput('Error: ' + error.message)
-    }
-    setLoading(false)
-  }
+    
+    // Simulate a small delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    const sop = `# Standard Operating Procedure
 
-  const transcribeAudio = async () => {
-    if (!audioFile) {
-      alert('Please select an audio file')
-      return
-    }
+## Process: ${sopInput}
 
-    setLoading(true)
-    const formData = new FormData()
-    formData.append('audio', audioFile)
+### Overview
+This SOP provides step-by-step instructions for ${sopInput.toLowerCase()}.
 
-    try {
-      const response = await fetch('/api/transcribe', {
-        method: 'POST',
-        body: formData
-      })
-      const data = await response.json()
-      setTranscription(data.text || 'Error transcribing audio')
-    } catch (error) {
-      setTranscription('Error: ' + error.message)
-    }
+### Steps
+1. Initial assessment and planning
+2. Resource allocation
+3. Execution
+4. Quality assurance
+5. Documentation and review
+
+### Guardrails
+- Ensure proper approvals at each stage
+- Maintain detailed records
+- Follow compliance requirements
+- Regular audits and reviews
+
+### Success Metrics
+- Process completion rate
+- Quality standards met
+- Timeline adherence
+- Cost efficiency
+`
+
+    setSopOutput(sop)
     setLoading(false)
   }
 
@@ -86,24 +82,6 @@ export default function App() {
             <h3>Generated SOP:</h3>
             <pre>{sopOutput}</pre>
             <button onClick={exportMarkdown}>Export as Markdown</button>
-          </>
-        )}
-      </div>
-
-      <div style={{ marginBottom: '40px' }}>
-        <h2>Transcribe Audio</h2>
-        <input
-          type="file"
-          accept="audio/*"
-          onChange={(e) => setAudioFile(e.target.files[0])}
-        />
-        <button onClick={transcribeAudio} disabled={loading}>
-          {loading ? 'Transcribing...' : 'Transcribe'}
-        </button>
-        {transcription && (
-          <>
-            <h3>Transcription:</h3>
-            <p>{transcription}</p>
           </>
         )}
       </div>
